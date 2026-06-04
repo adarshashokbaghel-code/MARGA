@@ -16,9 +16,9 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Marga.me — Know yourself. Choose your path.",
+  title: "Marga.me — Join the waitlist",
   description:
-    "Deep career self-knowledge for every person, everywhere. Psychometric science, skill assessment, and psychological profiling in one honest portrait of who you are.",
+    "Know yourself. Choose your path. Join the Marga waitlist for early access to deep career self-knowledge — psychometric science, skill assessment, and psychological profiling for everyone.",
   icons: {
     icon: "/icon-navy.svg",
   },
