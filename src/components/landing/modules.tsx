@@ -11,7 +11,7 @@ import { Feature108 } from "@/components/ui/shadcnblocks-com-feature108";
 const margaFrameworkTabs = [
   {
     value: "motivation",
-    icon: <Heart className="h-4 w-4 shrink-0 text-teal" />,
+    icon: <Heart className="size-4 shrink-0 text-black" strokeWidth={1.5} />,
     label: "Motivation",
     content: {
       badge: "M — Motivation",
@@ -32,7 +32,7 @@ const margaFrameworkTabs = [
   },
   {
     value: "ability",
-    icon: <Brain className="h-4 w-4 shrink-0 text-teal" />,
+    icon: <Brain className="size-4 shrink-0 text-black" strokeWidth={1.5} />,
     label: "Ability",
     content: {
       badge: "A — Ability",
@@ -53,7 +53,7 @@ const margaFrameworkTabs = [
   },
   {
     value: "resilience",
-    icon: <Sparkles className="h-4 w-4 shrink-0 text-teal" />,
+    icon: <Sparkles className="size-4 shrink-0 text-black" strokeWidth={1.5} />,
     label: "Resilience",
     content: {
       badge: "R — Resilience",
@@ -74,7 +74,7 @@ const margaFrameworkTabs = [
   },
   {
     value: "goals",
-    icon: <Target className="h-4 w-4 shrink-0 text-teal" />,
+    icon: <Target className="size-4 shrink-0 text-black" strokeWidth={1.5} />,
     label: "Goals",
     content: {
       badge: "G — Goals",
@@ -95,7 +95,7 @@ const margaFrameworkTabs = [
   },
   {
     value: "awareness",
-    icon: <Compass className="h-4 w-4 shrink-0 text-teal" />,
+    icon: <Compass className="size-4 shrink-0 text-black" strokeWidth={1.5} />,
     label: "Awareness",
     content: {
       badge: "A — Awareness",

@@ -11,6 +11,8 @@ import {
   Zap,
 } from "lucide-react";
 
+import { cn } from "@/lib/utils";
+
 const TRUST_ITEMS = [
   { icon: Shield, label: "Private & safe" },
   { icon: Brain, label: "Science-backed" },
@@ -20,13 +22,13 @@ const TRUST_ITEMS = [
 
 export function AssessmentTrustStrip() {
   return (
-    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-center sm:gap-3">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       {TRUST_ITEMS.map(({ icon: Icon, label }) => (
         <span
           key={label}
-          className="inline-flex items-center justify-center gap-1.5 rounded-full border border-teal/15 bg-background/60 px-2.5 py-1.5 text-[11px] font-medium text-foreground/80 backdrop-blur-sm sm:gap-2 sm:px-3 sm:text-sm"
+          className="inline-flex items-center justify-center gap-1.5 border border-black bg-white px-2 py-2 font-label text-[10px] uppercase tracking-widest text-black transition-colors hover:border-l-4 hover:border-l-marga-yellow"
         >
-          <Icon className="h-3 w-3 shrink-0 text-teal sm:h-3.5 sm:w-3.5" />
+          <Icon className="size-3 shrink-0 text-marga-yellow" strokeWidth={1.5} />
           {label}
         </span>
       ))}
@@ -64,33 +66,33 @@ export const JOURNEY_STEPS = [
 export function AssessmentJourneySteps({ compact }: { compact?: boolean }) {
   return (
     <div
-      className={
+      className={cn(
+        "grid gap-2",
         compact
-          ? "grid grid-cols-2 gap-2 min-[480px]:grid-cols-4"
-          : "grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 lg:grid-cols-4"
-      }
+          ? "grid-cols-2 min-[480px]:grid-cols-4"
+          : "grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4",
+      )}
     >
       {JOURNEY_STEPS.map((item) => (
         <div
           key={item.step}
-          className="group rounded-2xl border border-border/50 bg-gradient-to-br from-background/80 to-muted/30 p-4 transition-colors hover:border-teal/25"
+          className="group border border-black border-l-4 border-l-transparent bg-white p-3 transition-colors duration-100 hover:border-l-marga-yellow hover:bg-black hover:text-white"
         >
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-teal/70">
-              Step {item.step}
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-label text-[10px] uppercase tracking-widest text-marga-yellow group-hover:text-marga-yellow">
+              {item.step}
             </span>
-            <item.icon className="h-4 w-4 text-teal opacity-70" />
+            <item.icon
+              className="size-3.5 shrink-0 text-black group-hover:text-marga-yellow"
+              strokeWidth={1.5}
+            />
           </div>
+          <p className="mt-2 font-display text-sm leading-tight">{item.title}</p>
           {!compact ? (
-            <>
-              <p className="mt-2 text-sm font-semibold">{item.title}</p>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                {item.desc}
-              </p>
-            </>
-          ) : (
-            <p className="mt-1 text-xs font-medium">{item.title}</p>
-          )}
+            <p className="mt-1 font-serif text-xs leading-relaxed text-[#525252] group-hover:text-white/70">
+              {item.desc}
+            </p>
+          ) : null}
         </div>
       ))}
     </div>

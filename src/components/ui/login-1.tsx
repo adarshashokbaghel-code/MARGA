@@ -6,12 +6,28 @@ import { MargaLogo } from "@/components/brand/marga-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  margaGhostLinkStyles,
+  margaInputFocusStyles,
+  margaOutlineButtonStyles,
+  margaPrimaryButtonStyles,
+} from "@/lib/brand-styles";
+import { cn } from "@/lib/utils";
 
 interface LoginFormProps {
   onGoogleSignIn?: () => void;
   onResetSignupPreview?: () => void;
   onSkip?: () => void;
 }
+
+const primaryButtonStyles = margaPrimaryButtonStyles;
+const outlineButtonStyles = margaOutlineButtonStyles;
+const inputStyles = cn(
+  "!rounded-none border-0 border-b-2 border-black bg-transparent px-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-[#525252] placeholder:italic",
+  margaInputFocusStyles,
+);
+const labelStyles = "font-label text-[10px] uppercase tracking-widest text-[#525252]";
+const ghostLinkStyles = margaGhostLinkStyles;
 
 function LoginForm({ onGoogleSignIn, onResetSignupPreview, onSkip }: LoginFormProps) {
   const handleGoogle = () => {
@@ -22,30 +38,40 @@ function LoginForm({ onGoogleSignIn, onResetSignupPreview, onSkip }: LoginFormPr
     <form
       action="#"
       onSubmit={(e) => e.preventDefault()}
-      className="font-montserrat w-full rounded-lg border-0 bg-card shadow-none"
+      className="w-full bg-white text-black"
     >
       <div className="p-8">
-        <div>
-          <Link href="/" aria-label="Go home" className="inline-block">
-            <MargaLogo />
-          </Link>
-          <h2 className="mt-6 text-2xl leading-snug font-semibold text-pretty">
-            <span className="block text-muted-foreground">
-              Welcome back to Marga
-            </span>
-            Sign in to continue your assessment
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            New users complete a one-time profile after Google sign-in.
-          </p>
+        <Link
+          href="/"
+          aria-label="Go home"
+          className="inline-block focus-visible:outline focus-visible:outline-3 focus-visible:outline-black focus-visible:outline-offset-3"
+        >
+          <MargaLogo variant="monochrome" />
+        </Link>
+
+        <p className={cn(labelStyles, "mt-8 w-fit border border-black px-3 py-1.5")}>
+          Sign in
+        </p>
+
+        <div className="mt-6 flex items-center gap-4">
+          <div className="h-1 w-16 bg-black" />
+          <div className="size-2.5 border-2 border-black" />
         </div>
+
+        <h2 className="mt-6 font-display text-2xl leading-tight tracking-tight md:text-3xl">
+          Welcome back to Marga
+        </h2>
+        <p className="mt-3 font-serif text-sm leading-relaxed text-[#525252] md:text-base">
+          Sign in to continue your assessment. New users complete a one-time
+          profile after Google sign-in.
+        </p>
 
         <div className="mt-8 space-y-3">
           <Button
             type="button"
             variant="outline"
             size="lg"
-            className="flex w-full items-center gap-3"
+            className={cn(outlineButtonStyles, "flex h-12 w-full items-center justify-center gap-3")}
             onClick={handleGoogle}
           >
             <GoogleIcon />
@@ -56,7 +82,7 @@ function LoginForm({ onGoogleSignIn, onResetSignupPreview, onSkip }: LoginFormPr
             type="button"
             variant="outline"
             size="lg"
-            className="flex w-full items-center gap-3"
+            className={cn(outlineButtonStyles, "flex h-12 w-full items-center justify-center gap-3")}
             disabled
             title="Coming soon"
           >
@@ -68,7 +94,7 @@ function LoginForm({ onGoogleSignIn, onResetSignupPreview, onSkip }: LoginFormPr
             type="button"
             variant="outline"
             size="lg"
-            className="flex w-full items-center gap-3"
+            className={cn(outlineButtonStyles, "flex h-12 w-full items-center justify-center gap-3")}
             disabled
             title="Coming soon"
           >
@@ -77,15 +103,15 @@ function LoginForm({ onGoogleSignIn, onResetSignupPreview, onSkip }: LoginFormPr
           </Button>
         </div>
 
-        <div className="my-8 flex items-center">
-          <div className="h-px flex-1 bg-border" />
-          <span className="px-3 text-sm text-muted-foreground">or</span>
-          <div className="h-px flex-1 bg-border" />
+        <div className="my-8 flex items-center gap-4">
+          <div className="h-px flex-1 bg-black" />
+          <span className={labelStyles}>or</span>
+          <div className="h-px flex-1 bg-black" />
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="login-email" className="text-sm font-medium">
+            <Label htmlFor="login-email" className={labelStyles}>
               Email
             </Label>
             <Input
@@ -94,48 +120,34 @@ function LoginForm({ onGoogleSignIn, onResetSignupPreview, onSkip }: LoginFormPr
               name="email"
               id="login-email"
               placeholder="you@example.com"
-              className="border-input ring-1 ring-foreground/15"
+              className={inputStyles}
             />
           </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-teal font-montserrat text-white hover:bg-teal/90"
-            size="lg"
-          >
+          <Button type="submit" className={cn(primaryButtonStyles, "h-12 w-full")} size="lg">
             Continue
           </Button>
         </div>
 
         {onResetSignupPreview && (
-          <button
-            type="button"
-            onClick={onResetSignupPreview}
-            className="mt-4 w-full text-center text-xs text-muted-foreground underline-offset-2 hover:text-teal hover:underline"
-          >
+          <button type="button" onClick={onResetSignupPreview} className={cn(ghostLinkStyles, "mt-5 w-full")}>
             UI preview: reset first-time signup
           </button>
         )}
 
         {onSkip && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="mt-2 w-full text-muted-foreground"
-            onClick={onSkip}
-          >
+          <button type="button" onClick={onSkip} className={cn(ghostLinkStyles, "mt-3 w-full")}>
             Skip for now — start assessment
-          </Button>
+          </button>
         )}
       </div>
 
-      <div className="border-t border-border px-8 py-6 text-center">
-        <p className="text-sm text-muted-foreground">
+      <div className="border-t-2 border-black px-8 py-6 text-center">
+        <p className="font-serif text-sm text-[#525252]">
           Don&apos;t have an account?{" "}
-          <Button asChild variant="link" size="sm" className="h-auto px-1">
-            <Link href="#">Create one</Link>
-          </Button>
+          <Link href="#" className={ghostLinkStyles}>
+            Create one
+          </Link>
         </p>
       </div>
     </form>
@@ -146,7 +158,7 @@ function GoogleIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4 shrink-0"
+      className="size-4 shrink-0"
       viewBox="0 0 256 262"
       aria-hidden
     >
@@ -174,7 +186,7 @@ function FacebookIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4 shrink-0"
+      className="size-4 shrink-0"
       viewBox="0 0 256 256"
       aria-hidden
     >
@@ -194,7 +206,7 @@ function MicrosoftIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4 shrink-0"
+      className="size-4 shrink-0"
       viewBox="0 0 256 256"
       aria-hidden
     >

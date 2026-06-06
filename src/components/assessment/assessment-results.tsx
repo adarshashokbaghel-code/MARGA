@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   Crown,
   Hammer,
@@ -9,25 +8,26 @@ import {
   Lightbulb,
   MoveRight,
   Palette,
-  Sparkles,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { Header } from "@/components/landing/header";
-
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ARCHETYPE_LABELS,
   type ArchetypeId,
   type AssessmentResult,
 } from "@/lib/assessment";
+import type { ContextSignals } from "@/lib/assessment/types";
 import { getDivision } from "@/lib/assessment/stages";
 import { cn } from "@/lib/utils";
 
-import { AssessmentShell, GlassPanel } from "./assessment-shell";
-import { AssessmentMarquee } from "./assessment-marquee";
-import { AssessmentTrustStrip } from "./assessment-trust";
+import { AssessmentFlowFrame } from "./assessment-nav";
+import { AssessmentPageShell } from "./assessment-page-shell";
+import {
+  GlassPanel,
+  labelStyles,
+  sectionBadgeStyles,
+} from "./assessment-shell";
 
 const ARCHETYPE_ICONS: Record<ArchetypeId, LucideIcon> = {
   builder: Hammer,
@@ -37,76 +37,219 @@ const ARCHETYPE_ICONS: Record<ArchetypeId, LucideIcon> = {
   guide: HeartHandshake,
 };
 
+const ARCHETYPE_ORDER: ArchetypeId[] = [
+  "builder",
+  "thinker",
+  "creator",
+  "leader",
+  "guide",
+];
+
+function formatDate(iso: string) {
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      dateStyle: "long",
+      timeStyle: "short",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
 function ScoreBar({
-  id,
-  score,
+  value,
   confidence,
   highlight,
+  inverted,
 }: {
-  id: ArchetypeId;
-  score: number;
-  confidence: number;
-  highlight?: "primary" | "secondary";
+  value: number;
+  confidence?: number;
+  highlight?: boolean;
+  inverted?: boolean;
 }) {
-  const label = ARCHETYPE_LABELS[id];
-  const Icon = ARCHETYPE_ICONS[id];
-
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between gap-2">
-        <span className="flex items-center gap-2 text-sm font-medium">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal/10">
-            <Icon className="h-4 w-4 text-teal" />
-          </span>
-          {label.name}
-          {highlight === "primary" ? (
-            <Badge className="bg-teal/15 text-teal hover:bg-teal/15">Primary</Badge>
-          ) : null}
-          {highlight === "secondary" ? (
-            <Badge variant="outline" className="border-teal/30 text-teal">
-              Secondary
-            </Badge>
-          ) : null}
+    <div className="space-y-1">
+      <div className="flex items-center justify-between gap-2 text-sm">
+        <span className={cn("tabular-nums font-semibold", inverted && "text-white")}>
+          {value}%
         </span>
-        <span className="tabular-nums text-sm text-muted-foreground">{score}%</span>
+        {confidence !== undefined ? (
+          <span
+            className={cn(
+              labelStyles,
+              inverted ? "text-white/50" : undefined,
+            )}
+          >
+            {confidence}% confidence
+          </span>
+        ) : null}
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-muted/80">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${score}%` }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="h-full rounded-full bg-gradient-to-r from-teal to-cyan-500"
+      <div
+        className={cn(
+          "h-2 border border-black",
+          inverted ? "border-white/30 bg-white/10" : "bg-white",
+        )}
+      >
+        <div
+          className={cn(
+            "h-full transition-all",
+            highlight
+              ? inverted
+                ? "bg-marga-yellow"
+                : "bg-marga-yellow"
+              : inverted
+                ? "bg-white/60"
+                : "bg-[#525252]",
+          )}
+          style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
         />
       </div>
-      {confidence > 0 ? (
-        <p className="text-xs text-muted-foreground">
-          +{confidence} context alignment
+    </div>
+  );
+}
+
+function ArchetypeCard({
+  id,
+  role,
+  score,
+  confidence,
+}: {
+  id: ArchetypeId;
+  role: "primary" | "secondary";
+  score: number;
+  confidence: number;
+}) {
+  const info = ARCHETYPE_LABELS[id];
+  const Icon = ARCHETYPE_ICONS[id];
+  const inverted = role === "primary";
+
+  return (
+    <div
+      className={cn(
+        "flex h-full flex-col border border-black p-5 sm:p-6",
+        inverted ? "bg-black text-white" : "bg-white",
+      )}
+    >
+      <p
+        className={cn(
+          labelStyles,
+          inverted ? "text-white/60" : undefined,
+        )}
+      >
+        {role === "primary" ? "Lead archetype" : "Secondary strength"}
+      </p>
+      <div className="mt-4 flex flex-1 flex-col">
+        <div className="flex items-start gap-4">
+          <Icon className="size-10 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="text-2xl font-semibold tracking-tight">{info.name}</h3>
+            <p
+              className={cn(
+                "mt-1 text-sm",
+                inverted ? "text-white/70" : "text-[#525252]",
+              )}
+            >
+              {info.tagline}
+            </p>
+            <p
+              className={cn(
+                "mt-2 text-xs",
+                inverted ? "text-white/50" : "text-[#525252]",
+              )}
+            >
+              Combines: {info.combines}
+            </p>
+          </div>
+        </div>
+        <div className="mt-5">
+          <ScoreBar
+            value={score}
+            confidence={confidence}
+            highlight
+            inverted={inverted}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SectionTitle({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div className="mb-4 sm:mb-5">
+      {eyebrow ? <p className={labelStyles}>{eyebrow}</p> : null}
+      <h2 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+        {title}
+      </h2>
+      {description ? (
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#525252] sm:text-base">
+          {description}
         </p>
       ) : null}
     </div>
   );
 }
 
-function SectionBlock({
-  title,
-  subtitle,
-  children,
-  className,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
+function ContextSignalsPanel({ signals }: { signals: ContextSignals }) {
+  const rows: { label: string; value: string | string[] | undefined }[] = [
+    { label: "Grade / year", value: signals.grade },
+    { label: "Career pressure", value: signals.careerPressure },
+    { label: "Future clarity", value: signals.futureClarity },
+    { label: "Exploration style", value: signals.explorationStyle },
+    { label: "MARGA goal", value: signals.margaGoal },
+    { label: "Activities you enjoy", value: signals.c3Activities },
+    { label: "Future worlds that interest you", value: signals.c4FutureWorlds },
+  ];
+
+  const hasContent = rows.some((r) =>
+    Array.isArray(r.value) ? r.value.length > 0 : Boolean(r.value),
+  );
+
+  if (!hasContent) return null;
+
   return (
-    <GlassPanel className={cn("p-6 md:p-8", className)}>
-      <div className="mb-5">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        {subtitle ? (
-          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
-        ) : null}
-      </div>
-      {children}
+    <GlassPanel className="p-5 sm:p-6">
+      <SectionTitle
+        eyebrow="From your answers"
+        title="Context signals"
+        description="Personal details you shared that shaped confidence in your results."
+      />
+      <dl className="grid gap-px border border-black bg-black sm:grid-cols-2">
+        {rows.map((row) => {
+          const empty = Array.isArray(row.value)
+            ? row.value.length === 0
+            : !row.value;
+          if (empty) return null;
+
+          return (
+            <div key={row.label} className="bg-white p-4">
+              <dt className={labelStyles}>{row.label}</dt>
+              <dd className="mt-2 text-sm leading-relaxed text-black">
+                {Array.isArray(row.value) ? (
+                  <ul className="space-y-1">
+                    {row.value.map((item) => (
+                      <li key={item} className="flex gap-2">
+                        <span className="text-[#525252]">→</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  row.value
+                )}
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
     </GlassPanel>
   );
 }
@@ -114,210 +257,322 @@ function SectionBlock({
 export function AssessmentResults({ result }: { result: AssessmentResult }) {
   const primary = ARCHETYPE_LABELS[result.primaryArchetype];
   const secondary = ARCHETYPE_LABELS[result.secondaryArchetype];
-  const PrimaryIcon = ARCHETYPE_ICONS[result.primaryArchetype];
   const division =
-    result.stage === "mindset"
-      ? getDivision("mindset")
-      : getDivision("mirror");
+    result.stage === "mindset" ? getDivision("mindset") : getDivision("mirror");
+
+  const sortedArchetypes = [...ARCHETYPE_ORDER].sort(
+    (a, b) => result.archetypeScores[b] - result.archetypeScores[a],
+  );
 
   return (
-    <div className="space-y-8 pb-8 md:space-y-10">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-teal/15 bg-gradient-to-br from-teal/[0.08] via-background/80 to-violet-500/[0.06] px-4 py-8 text-center sm:px-6 sm:py-10 md:rounded-3xl md:px-10 md:py-12"
-      >
-        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-teal/20 blur-3xl" />
-        <Badge className="mb-3 border-teal/20 bg-teal/10 text-teal hover:bg-teal/10">
-          {division.name} · Your portrait
-        </Badge>
-        <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl md:text-5xl">
-          {result.combination.identity}
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl leading-relaxed text-muted-foreground">
-          {result.combination.pattern}
-        </p>
-        <div className="mt-6 flex justify-center">
-          <AssessmentTrustStrip />
-        </div>
-      </motion.div>
-
-      <GlassPanel glow className="relative overflow-hidden p-8">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-teal/10 via-transparent to-violet-500/5" />
-        <div className="relative flex flex-col gap-6 md:flex-row md:items-center">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl border border-teal/20 bg-teal/10 shadow-lg shadow-teal/10">
-            <PrimaryIcon className="h-10 w-10 text-teal" />
+    <AssessmentFlowFrame step={4}>
+      <div className="w-full space-y-5 sm:space-y-6">
+        {/* Hero */}
+        <GlassPanel className="border-2 border-black border-l-4 border-l-marga-yellow p-6 sm:p-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-4xl">
+              <p className={sectionBadgeStyles}>
+                {division.name} division · Career portrait
+              </p>
+              <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+                {result.combination.identity}
+              </h1>
+              <p className="mt-4 text-base leading-relaxed text-[#525252] sm:text-lg">
+                {result.combination.pattern}
+              </p>
+            </div>
+            <div className="shrink-0 border border-black bg-[#F5F5F5] px-4 py-3 text-sm">
+              <p className={labelStyles}>Evaluated</p>
+              <p className="mt-1 font-medium">{formatDate(result.evaluatedAt)}</p>
+            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-teal">{primary.name} + {secondary.name}</p>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+        </GlassPanel>
+
+        {/* Archetypes row */}
+        <div className="grid gap-4 lg:grid-cols-2">
+          <ArchetypeCard
+            id={result.primaryArchetype}
+            role="primary"
+            score={result.archetypeScores[result.primaryArchetype]}
+            confidence={result.archetypeConfidence[result.primaryArchetype]}
+          />
+          <ArchetypeCard
+            id={result.secondaryArchetype}
+            role="secondary"
+            score={result.archetypeScores[result.secondaryArchetype]}
+            confidence={result.archetypeConfidence[result.secondaryArchetype]}
+          />
+        </div>
+
+        {/* Logic + full scores */}
+        <div className="grid gap-4 lg:grid-cols-5">
+          <GlassPanel className="p-5 sm:p-6 lg:col-span-2">
+            <SectionTitle
+              eyebrow="Your blend"
+              title="What this combination means"
+            />
+            <p className="text-sm leading-relaxed text-[#525252] sm:text-base">
               {result.combination.logic}
             </p>
-          </div>
-          <div className="flex flex-wrap gap-2 md:justify-end">
-            {result.combination.domains.slice(0, 3).map((d) => (
+            <div className="mt-5 border-t border-[#E5E5E5] pt-5">
+              <p className={labelStyles}>Archetype pairing</p>
+              <p className="mt-2 text-sm">
+                <strong className="text-black">{primary.name}</strong>
+                <span className="text-[#525252]"> — {primary.tagline}</span>
+              </p>
+              <p className="mt-2 text-sm">
+                <strong className="text-black">{secondary.name}</strong>
+                <span className="text-[#525252]"> — {secondary.tagline}</span>
+              </p>
+            </div>
+          </GlassPanel>
+
+          <GlassPanel className="p-5 sm:p-6 lg:col-span-3">
+            <SectionTitle
+              eyebrow="All five archetypes"
+              title="Your archetype profile"
+              description="How strongly each pattern showed up in your answers. Confidence reflects context signals from your responses."
+            />
+            <div className="space-y-4">
+              {sortedArchetypes.map((id) => {
+                const isLead =
+                  id === result.primaryArchetype ||
+                  id === result.secondaryArchetype;
+                return (
+                  <div key={id}>
+                    <div className="mb-1.5 flex items-center justify-between gap-2">
+                      <span
+                        className={cn(
+                          "text-sm",
+                          isLead ? "font-semibold text-black" : "text-[#525252]",
+                        )}
+                      >
+                        {ARCHETYPE_LABELS[id].name}
+                        {id === result.primaryArchetype ? (
+                          <span className="ml-2 border border-marga-yellow bg-marga-yellow-muted px-1.5 py-0.5 font-label text-[9px] uppercase tracking-widest text-black">
+                            Lead
+                          </span>
+                        ) : id === result.secondaryArchetype ? (
+                          <span className="ml-2 border border-[#E5E5E5] px-1.5 py-0.5 font-label text-[9px] uppercase tracking-widest text-[#525252]">
+                            2nd
+                          </span>
+                        ) : null}
+                      </span>
+                    </div>
+                    <ScoreBar
+                      value={result.archetypeScores[id]}
+                      confidence={result.archetypeConfidence[id]}
+                      highlight={isLead}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </GlassPanel>
+        </div>
+
+        {/* Domains + Industries */}
+        <div className="grid gap-4 lg:grid-cols-2">
+          <GlassPanel className="p-5 sm:p-6">
+            <SectionTitle
+              eyebrow="Where you could thrive"
+              title="Domain fit"
+              description="Career domains ranked by how well they align with your archetype blend and interests."
+            />
+            <ul className="space-y-3">
+              {result.domains.map((d, i) => (
+                <li key={d.domain} className="border border-black p-3 sm:p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <span className="font-label text-[10px] uppercase tracking-widest text-[#525252]">
+                        #{i + 1}
+                      </span>
+                      <p className="mt-1 font-medium">{d.domain}</p>
+                    </div>
+                    <span className="shrink-0 font-label text-xs tabular-nums">
+                      {d.confidence}%
+                    </span>
+                  </div>
+                  <div className="mt-3 h-1 border border-black bg-white">
+                    <div
+                      className="h-full bg-marga-yellow"
+                      style={{ width: `${d.confidence}%` }}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </GlassPanel>
+
+          <GlassPanel className="p-5 sm:p-6">
+            <SectionTitle
+              eyebrow="Ecosystems to explore"
+              title="Industry alignment"
+              description="Industries where your strengths and domain interests may overlap."
+            />
+            <ul className="space-y-3">
+              {result.industries.map((ind, i) => (
+                <li
+                  key={ind.industry}
+                  className="flex items-center justify-between gap-4 border-b border-[#E5E5E5] pb-3 last:border-0"
+                >
+                  <span className="text-sm">
+                    <span className="mr-2 font-label text-[10px] text-[#525252]">
+                      {i + 1}.
+                    </span>
+                    {ind.industry}
+                  </span>
+                  <span className="shrink-0 font-label text-xs tabular-nums">
+                    {ind.confidence}%
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {result.combination.industries.length > 0 ? (
+              <div className="mt-5 border-t border-[#E5E5E5] pt-4">
+                <p className={labelStyles}>From your archetype pairing</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {result.combination.industries.map((ind) => (
+                    <span
+                      key={ind}
+                      className="border border-black px-2.5 py-1 text-xs"
+                    >
+                      {ind}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </GlassPanel>
+        </div>
+
+        {/* Exit roles */}
+        <GlassPanel className="p-5 sm:p-6">
+          <SectionTitle
+            eyebrow="Next steps"
+            title="Roles & pathways worth exploring"
+            description="Starting points — not prescriptions. Use these to research, shadow, or try small projects."
+          />
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            {result.exitRoles.map((role) => (
               <span
-                key={d}
-                className="rounded-full border border-teal/20 bg-background/60 px-3 py-1 text-xs font-medium backdrop-blur-sm"
+                key={role}
+                className="border border-black bg-[#F5F5F5] px-3 py-2 text-sm sm:px-4"
               >
-                {d}
+                {role}
               </span>
             ))}
           </div>
-        </div>
-      </GlassPanel>
+          {result.combination.exitRoles.length > 0 ? (
+            <div className="mt-5 border-t border-[#E5E5E5] pt-4">
+              <p className={labelStyles}>Archetype-suggested pathways</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {result.combination.exitRoles.map((role) => (
+                  <span
+                    key={role}
+                    className="border border-[#E5E5E5] px-2.5 py-1 text-xs text-[#525252]"
+                  >
+                    {role}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </GlassPanel>
 
-      <SectionBlock
-        title="Archetype signal map"
-        subtitle="Questions → Signals → Archetypes. Context adjusts confidence, not core identity."
-      >
-        <div className="space-y-5">
-          {(Object.keys(ARCHETYPE_LABELS) as ArchetypeId[]).map((id) => (
-            <ScoreBar
-              key={id}
-              id={id}
-              score={result.archetypeScores[id]}
-              confidence={result.archetypeConfidence[id]}
-              highlight={
-                id === result.primaryArchetype
-                  ? "primary"
-                  : id === result.secondaryArchetype
-                    ? "secondary"
-                    : undefined
-              }
+        {/* MARGA report */}
+        <GlassPanel className="p-5 sm:p-6">
+          <SectionTitle
+            eyebrow="M.A.R.G.A. report"
+            title="Module-by-module insights"
+            description="A readout across all five modules — motivation, ability, resilience, goals, and awareness."
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {result.margaSections.map((section) => (
+              <div
+                key={`${section.letter}-${section.name}`}
+                className="flex flex-col border border-black p-4 sm:p-5"
+              >
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-semibold">{section.letter}</span>
+                  <span className="font-label text-[10px] uppercase tracking-widest text-[#525252]">
+                    {section.name}
+                  </span>
+                </div>
+                <p className="mt-3 text-xs leading-relaxed text-[#525252]">
+                  {section.meaning}
+                </p>
+                <p className="mt-3 flex-1 border-l-2 border-black pl-3 text-sm leading-relaxed">
+                  {section.output}
+                </p>
+              </div>
+            ))}
+          </div>
+        </GlassPanel>
+
+        {/* Growth flags */}
+        {result.growthFlags.length > 0 ? (
+          <GlassPanel className="p-5 sm:p-6">
+            <SectionTitle
+              eyebrow="Growth edges"
+              title="Areas to watch & develop"
+              description="Patterns that may need attention — use as conversation starters with mentors or counselors."
             />
-          ))}
-        </div>
-      </SectionBlock>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {result.growthFlags.map((flag) => (
+                <li
+                  key={flag.type}
+                  className="border border-black bg-[#F5F5F5] p-4"
+                >
+                  <p className={labelStyles}>{flag.type.replace(/_/g, " ")}</p>
+                  <p className="mt-2 text-sm leading-relaxed">{flag.message}</p>
+                </li>
+              ))}
+            </ul>
+          </GlassPanel>
+        ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <SectionBlock title="Domain affinities">
-          <div className="space-y-3">
-            {result.domains.map((d, i) => (
-              <div
-                key={d.domain}
-                className="flex items-center gap-3 rounded-2xl border border-border/50 bg-background/40 px-4 py-3"
-              >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-xs font-bold text-teal">
-                  {i + 1}
-                </span>
-                <span className="flex-1 text-sm">{d.domain}</span>
-                <Badge variant="secondary" className="tabular-nums">
-                  {d.confidence}%
-                </Badge>
-              </div>
-            ))}
-          </div>
-        </SectionBlock>
+        <ContextSignalsPanel signals={result.contextSignals} />
 
-        <SectionBlock title="Industry alignments">
-          <div className="space-y-3">
-            {result.industries.map((ind) => (
-              <div
-                key={ind.industry}
-                className="flex items-center justify-between rounded-2xl border border-border/50 bg-background/40 px-4 py-3"
-              >
-                <span className="text-sm">{ind.industry}</span>
-                <Badge variant="secondary" className="tabular-nums">
-                  {ind.confidence}%
-                </Badge>
-              </div>
-            ))}
-          </div>
-        </SectionBlock>
-      </div>
-
-      <SectionBlock
-        title="Exploration pathways"
-        subtitle="Possibilities worth exploring — not rigid career prescriptions."
-      >
-        <div className="flex flex-wrap gap-2">
-          {result.exitRoles.map((role) => (
-            <span
-              key={role}
-              className="rounded-full border border-teal/20 bg-teal/5 px-4 py-2 text-sm font-medium"
-            >
-              {role}
-            </span>
-          ))}
-        </div>
-      </SectionBlock>
-
-      <SectionBlock title="Growth insights">
-        <div className="grid gap-3 md:grid-cols-2">
-          {result.growthFlags.map((flag) => (
-            <div
-              key={flag.type}
-              className="rounded-2xl border border-border/50 bg-gradient-to-br from-muted/40 to-transparent p-4 text-sm leading-relaxed text-muted-foreground"
-            >
-              <Sparkles className="mb-2 h-4 w-4 text-teal" />
-              {flag.message}
-            </div>
-          ))}
-        </div>
-      </SectionBlock>
-
-      <SectionBlock title="MARGA report">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {result.margaSections.map((section) => (
-            <div
-              key={`${section.letter}-${section.name}`}
-              className="rounded-2xl border border-border/50 bg-background/40 p-4"
-            >
-              <p className="text-xs font-semibold uppercase tracking-wider text-teal">
-                {section.letter} — {section.name}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">{section.meaning}</p>
-              <p className="mt-3 text-sm font-medium leading-relaxed">{section.output}</p>
-            </div>
-          ))}
-        </div>
-      </SectionBlock>
-
-      <GlassPanel className="relative overflow-hidden border-0 bg-navy-deep p-8 text-center text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal/30 via-transparent to-transparent" />
-        <div className="relative space-y-4">
-          <h3 className="text-2xl font-semibold">
-            The goal is alignment, not prediction.
-          </h3>
-          <p className="mx-auto max-w-md text-sm text-white/75">
-            Revisit as you grow. Your archetypes may evolve — that is the point.
+        {/* CTA */}
+        <GlassPanel inverted className="p-8 text-center sm:p-10">
+          <p className="text-xl font-semibold italic text-white sm:text-2xl">
+            Alignment, not prediction — revisit as you grow.
           </p>
-          <div className="flex flex-col items-center gap-3 pt-2 sm:flex-row sm:justify-center">
+          <p className="mx-auto mt-3 max-w-xl text-sm text-white/70">
+            Your portrait reflects who you are right now. Save these results, share
+            them with someone you trust, and retake the assessment as your interests
+            evolve.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button
               asChild
-              size="lg"
-              className="rounded-full bg-teal px-8 text-white hover:bg-teal/90"
+              variant="outline"
+              className="!h-11 !rounded-none !border-2 !border-white !bg-white !px-6 font-label text-xs font-medium uppercase tracking-widest !text-black transition-colors hover:!border-marga-yellow hover:!bg-marga-yellow hover:!text-black"
             >
-              <Link href="/assessment">
+              <Link href="/assessment" className="inline-flex items-center gap-2">
                 Retake assessment
-                <MoveRight className="ml-2 h-4 w-4" />
+                <MoveRight className="size-4" strokeWidth={1.5} />
               </Link>
             </Button>
             <Button
               asChild
               variant="outline"
-              className="rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10"
+              className="!h-11 !rounded-none !border-2 !border-white !bg-transparent !px-6 font-label text-xs font-medium uppercase tracking-widest !text-white transition-colors hover:!border-marga-yellow hover:!bg-marga-yellow hover:!text-black"
             >
               <Link href="/">Back to home</Link>
             </Button>
           </div>
-        </div>
-      </GlassPanel>
-    </div>
+        </GlassPanel>
+
+        <p className="pb-4 text-center text-xs text-[#525252]">
+          {primary.name} + {secondary.name} · {division.name} division · MARGA
+        </p>
+      </div>
+    </AssessmentFlowFrame>
   );
 }
 
 export function AssessmentResultsShell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-full flex-col">
-      <Header />
-      <div className="pt-[4.75rem] md:pt-[5.5rem]">
-        <AssessmentMarquee />
-        <main className="pb-[max(4rem,env(safe-area-inset-bottom))] pt-4 sm:pt-6 md:pt-8">
-          <AssessmentShell>{children}</AssessmentShell>
-        </main>
-      </div>
-    </div>
-  );
+  return <AssessmentPageShell>{children}</AssessmentPageShell>;
 }

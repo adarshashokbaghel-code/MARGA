@@ -1,9 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ArrowRight, Check, GraduationCap, Search, Sparkles } from "lucide-react";
+import type { ReactNode } from "react";
+import { ArrowRight, Check, GraduationCap, Search } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ASSESSMENT_DIVISIONS,
@@ -12,11 +11,14 @@ import {
 } from "@/lib/assessment/stages";
 import { cn } from "@/lib/utils";
 
-import { GlassPanel } from "./assessment-shell";
+import { AssessmentFlowFrame } from "./assessment-nav";
 import {
-  AssessmentJourneySteps,
-  AssessmentTrustStrip,
-} from "./assessment-trust";
+  GlassPanel,
+  labelStyles,
+  primaryButtonStyles,
+  SectionHeader,
+} from "./assessment-shell";
+import { AssessmentJourneySteps, AssessmentTrustStrip } from "./assessment-trust";
 
 const DIVISION_ICONS = {
   mirror: Search,
@@ -28,6 +30,7 @@ interface StageSelectorProps {
   onSelect: (division: AssessmentDivision) => void;
   onContinue: () => void;
   userName?: string;
+  resumeBanner?: ReactNode;
 }
 
 export function StageSelector({
@@ -35,157 +38,160 @@ export function StageSelector({
   onSelect,
   onContinue,
   userName,
+  resumeBanner,
 }: StageSelectorProps) {
   return (
-    <div className="space-y-8 pb-4 sm:space-y-10">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45 }}
-        className="relative overflow-hidden rounded-2xl border border-teal/15 bg-gradient-to-br from-teal/[0.08] via-background/80 to-violet-500/[0.06] px-4 py-8 text-center sm:px-6 sm:py-10 md:rounded-3xl md:px-12 md:py-14"
-      >
-        <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-teal/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-cyan-400/15 blur-3xl" />
+    <AssessmentFlowFrame step={1}>
+      <div className="space-y-8">
+        {resumeBanner}
 
-        <div className="relative space-y-5">
-          <Badge className="border-teal/20 bg-teal/10 text-teal hover:bg-teal/10">
-            <Sparkles className="mr-1.5 h-3 w-3" />
-            Self-discovery · not a test
-          </Badge>
-
-          <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl md:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
-            Discover who you are
-            <span className="block bg-gradient-to-r from-teal to-cyan-500 bg-clip-text text-transparent">
-              before you choose what to do
-            </span>
-          </h1>
-
-          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
+        <GlassPanel className="p-5 sm:p-8">
+          <p className={labelStyles}>Self-discovery · not a test</p>
+          <h1 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl lg:text-4xl">
             {userName ? `Welcome, ${userName.split(" ")[0]}. ` : ""}
-            Marga maps your motivations, abilities, and aspirations into a
-            personal portrait — built for where you are in life right now.
+            Let&apos;s find your stage
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#525252] md:text-base">
+            Marga maps your motivations, abilities, resilience, goals, and
+            self-awareness into one honest portrait. First, choose the division
+            built for your age — questions and context adapt to where you are
+            right now.
           </p>
+          <div className="mt-5">
+            <AssessmentTrustStrip />
+          </div>
+        </GlassPanel>
 
-          <AssessmentTrustStrip />
-        </div>
-      </motion.div>
+        <div>
+          <SectionHeader
+            badge="Step 1"
+            title="Which life stage are you in?"
+            description="Select the card that matches your age group. You can review and change this on the next screen."
+          />
 
-      <div className="space-y-6">
-        <div className="text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-teal">
-            Step 1 of 4
-          </p>
-          <h2 className="mt-2 text-xl font-semibold sm:text-2xl md:text-3xl">
-            Which stage are you in?
-          </h2>
-          <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
-            Pick the division designed for your age band. You can change this
-            before you begin.
-          </p>
-        </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {ASSESSMENT_DIVISIONS.map((division) => {
+              const Icon = DIVISION_ICONS[division.id];
+              const isSelected = selected === division.id;
+              const total = getTotalQuestions(division.id);
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {ASSESSMENT_DIVISIONS.map((division, index) => {
-            const Icon = DIVISION_ICONS[division.id];
-            const isSelected = selected === division.id;
-            const total = getTotalQuestions(division.id);
-
-            return (
-              <motion.button
-                key={division.id}
-                type="button"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.08 }}
-                disabled={!division.available}
-                onClick={() => onSelect(division.id)}
-                className="text-left"
-              >
-                <GlassPanel
-                  glow={isSelected}
-                  className={cn(
-                    "h-full p-4 transition-all duration-300 sm:p-6 md:p-7",
-                    isSelected
-                      ? "border-teal/40 bg-teal/[0.04] shadow-lg shadow-teal/10"
-                      : "hover:border-teal/25 hover:bg-background/80",
-                    !division.available && "opacity-50",
-                  )}
-// comment
+              return (
+                <button
+                  key={division.id}
+                  type="button"
+                  disabled={!division.available}
+                  onClick={() => onSelect(division.id)}
+                  className={cn("text-left", !division.available && "opacity-40")}
+                  aria-pressed={isSelected}
                 >
-                  <div
+                  <GlassPanel
                     className={cn(
-                      "mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br",
-                      division.accent,
-                      "border border-white/20",
+                      "h-full p-5 transition-colors duration-100",
+                      isSelected
+                        ? "border-l-4 border-l-marga-yellow bg-black text-white"
+                        : "hover:border-l-4 hover:border-l-marga-yellow hover:bg-[#F5F5F5]",
                     )}
                   >
-                    <Icon className="h-6 w-6 text-teal" />
-                  </div>
-
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wider text-teal">
-                        {division.tagline}
-                      </p>
-                      <h3 className="mt-1 text-xl font-semibold md:text-2xl">
-                        {division.name}
-                      </h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {division.ageBand}
-                      </p>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <span
+                          className={cn(
+                            "flex size-10 shrink-0 items-center justify-center border",
+                            isSelected ? "border-white" : "border-black",
+                          )}
+                        >
+                          <Icon className="size-4" strokeWidth={1.5} />
+                        </span>
+                        <div>
+                          <p className={cn(labelStyles, isSelected && "text-white/60")}>
+                            {division.tagline}
+                          </p>
+                          <h3 className="mt-1 text-xl font-semibold">{division.name}</h3>
+                          <p
+                            className={cn(
+                              "mt-0.5 text-xs",
+                              isSelected ? "text-white/70" : "text-[#525252]",
+                            )}
+                          >
+                            {division.ageBand}
+                          </p>
+                        </div>
+                      </div>
+                      {isSelected ? (
+                        <Check className="size-4 shrink-0" strokeWidth={2} />
+                      ) : null}
                     </div>
-                    {isSelected ? (
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal text-white">
-                        <Check className="h-4 w-4" />
-                      </span>
-                    ) : null}
-                  </div>
 
-                  <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                    {division.description}
-                  </p>
+                    <p
+                      className={cn(
+                        "mt-4 text-sm leading-relaxed",
+                        isSelected ? "text-white/85" : "text-[#525252]",
+                      )}
+                    >
+                      {division.description}
+                    </p>
+                    <p
+                      className={cn(
+                        "mt-3 text-xs leading-relaxed",
+                        isSelected ? "text-white/60" : "text-[#525252]",
+                      )}
+                    >
+                      {division.experience}
+                    </p>
 
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-muted/80 px-3 py-1 text-xs font-medium">
-                      {total} questions
-                    </span>
-                    <span className="rounded-full bg-muted/80 px-3 py-1 text-xs font-medium">
-                      ~{division.minutes} min
-                    </span>
-                    <span className="rounded-full bg-muted/80 px-3 py-1 text-xs font-medium">
-                      {division.coreStage}
-                    </span>
-                  </div>
-                </GlassPanel>
-              </motion.button>
-            );
-          })}
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {[
+                        `${total} questions`,
+                        `~${division.minutes} min`,
+                        division.coreStage,
+                      ].map((tag) => (
+                        <span
+                          key={tag}
+                          className={cn(
+                            "border px-2 py-1 font-label text-[10px] uppercase tracking-widest",
+                            isSelected
+                              ? "border-white/40 text-white/80"
+                              : "border-black text-[#525252]",
+                          )}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </GlassPanel>
+                </button>
+              );
+            })}
+          </div>
+
+          {!selected ? (
+            <p className="mt-4 border border-dashed border-black bg-[#F5F5F5] p-4 text-sm text-[#525252]">
+              Select a stage above to continue to the overview.
+            </p>
+          ) : null}
+
+          <div className="mt-6">
+            <Button
+              size="lg"
+              disabled={!selected}
+              className={cn(primaryButtonStyles, "h-11 gap-2 px-8")}
+              onClick={onContinue}
+            >
+              Continue to overview
+              <ArrowRight className="size-4" strokeWidth={1.5} />
+            </Button>
+          </div>
         </div>
 
-        <div className="flex justify-center pt-2">
-          <Button
-            size="lg"
-            disabled={!selected}
-            className="w-full rounded-full bg-teal px-10 text-white hover:bg-teal/90 sm:w-auto"
-            onClick={onContinue}
-          >
-            Continue to overview
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+        <div className="border-t-2 border-black pt-8">
+          <SectionHeader
+            badge="The journey"
+            title="What happens after you choose"
+            description="Four phases — from choosing your stage to receiving your personal portrait."
+          />
+          <AssessmentJourneySteps />
         </div>
       </div>
-
-      <div className="space-y-4 border-t border-border/40 pt-8">
-        <div className="text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-teal">
-            How it works
-          </p>
-          <h3 className="mt-2 text-xl font-semibold md:text-2xl">
-            From questions to your portrait
-          </h3>
-        </div>
-        <AssessmentJourneySteps />
-      </div>
-    </div>
+    </AssessmentFlowFrame>
   );
 }

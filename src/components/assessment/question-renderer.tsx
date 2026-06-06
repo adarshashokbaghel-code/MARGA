@@ -1,10 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
 import type { AssessmentQuestion, AnswerValue } from "@/lib/assessment";
 import { cn } from "@/lib/utils";
+
+import { labelStyles } from "./assessment-shell";
 
 const OPTION_LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 
@@ -19,39 +20,34 @@ export function QuestionRenderer({
 }) {
   if (question.type === "single_select" && question.options) {
     return (
-      <div className="space-y-2.5">
+      <div className="space-y-2">
         {question.options.map((opt, i) => {
           const selected = value === opt.id;
           return (
-            <motion.button
+            <button
               key={opt.id}
               type="button"
-              whileTap={{ scale: 0.99 }}
               onClick={() => onChange(opt.id)}
               className={cn(
-                "group flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left transition-all duration-200 sm:gap-4 sm:rounded-2xl sm:px-4 sm:py-4",
+                "flex w-full items-center gap-3 border px-4 py-3.5 text-left transition-colors duration-100",
                 selected
-                  ? "border-teal/50 bg-teal/10 shadow-sm shadow-teal/10"
-                  : "border-border/60 bg-background/40 hover:border-teal/30 hover:bg-muted/30",
+                  ? "border-black border-l-4 border-l-marga-yellow bg-black text-white"
+                  : "border-black bg-white hover:border-l-4 hover:border-l-marga-yellow hover:bg-[#F5F5F5]",
               )}
             >
               <span
                 className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-semibold transition-colors sm:h-9 sm:w-9 sm:rounded-xl sm:text-sm",
-                  selected
-                    ? "bg-teal text-white"
-                    : "bg-muted text-muted-foreground group-hover:bg-teal/10 group-hover:text-teal",
+                  "flex size-7 shrink-0 items-center justify-center border font-label text-xs",
+                  selected ? "border-white" : "border-black",
                 )}
               >
                 {OPTION_LETTERS[i] ?? i + 1}
               </span>
-              <span className="pt-0.5 text-sm leading-relaxed sm:pt-1.5 md:text-base">
+              <span className="flex-1 font-serif text-sm leading-relaxed sm:text-base">
                 {opt.label}
               </span>
-              {selected ? (
-                <Check className="ml-auto mt-2 h-4 w-4 shrink-0 text-teal" />
-              ) : null}
-            </motion.button>
+              {selected ? <Check className="size-4 shrink-0" strokeWidth={1.5} /> : null}
+            </button>
           );
         })}
       </div>
@@ -71,13 +67,11 @@ export function QuestionRenderer({
     return (
       <div className="space-y-3">
         {question.maxSelect ? (
-          <p className="rounded-full bg-muted/60 px-3 py-1 text-xs font-medium text-muted-foreground w-fit">
-            {selected.length} / {question.maxSelect} selected
+          <p className={cn(labelStyles, "border border-black px-2 py-1 w-fit")}>
+            {selected.length} of {question.maxSelect} picked
           </p>
-        ) : (
-          <p className="text-xs text-muted-foreground">Select all that apply</p>
-        )}
-        <div className="grid gap-2 sm:grid-cols-2">
+        ) : null}
+        <div className="space-y-2">
           {question.options.map((opt) => {
             const isOn = selected.includes(opt.id);
             return (
@@ -86,19 +80,19 @@ export function QuestionRenderer({
                 type="button"
                 onClick={() => toggle(opt.id)}
                 className={cn(
-                  "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-all",
+                  "flex w-full items-center gap-3 border px-4 py-3 text-left font-serif text-sm transition-colors duration-100",
                   isOn
-                    ? "border-teal/50 bg-teal/10"
-                    : "border-border/60 bg-background/40 hover:border-teal/25",
+                    ? "border-black border-l-4 border-l-marga-yellow bg-black text-white"
+                    : "border-black bg-white hover:bg-[#F5F5F5]",
                 )}
               >
                 <span
                   className={cn(
-                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border",
-                    isOn ? "border-teal bg-teal text-white" : "border-border",
+                    "flex size-5 shrink-0 items-center justify-center border",
+                    isOn ? "border-white bg-white text-black" : "border-black",
                   )}
                 >
-                  {isOn ? <Check className="h-3 w-3" /> : null}
+                  {isOn ? <Check className="size-3" strokeWidth={2} /> : null}
                 </span>
                 {opt.label}
               </button>
@@ -112,27 +106,27 @@ export function QuestionRenderer({
   if (question.type === "likert") {
     const rating = (value as number) ?? 0;
     return (
-      <div className="space-y-6">
-        <div className="flex justify-between gap-1.5 px-0 sm:gap-2 sm:px-1">
+      <div className="space-y-3">
+        <div className="grid grid-cols-5 gap-2">
           {[1, 2, 3, 4, 5].map((n) => (
             <button
               key={n}
               type="button"
               onClick={() => onChange(n)}
               className={cn(
-                "flex h-10 min-w-0 flex-1 flex-col items-center justify-center rounded-xl border text-xs font-semibold transition-all sm:h-14 sm:w-14 sm:flex-none sm:rounded-2xl sm:text-sm",
+                "flex h-12 items-center justify-center border font-display text-lg transition-colors duration-100",
                 rating === n
-                  ? "scale-105 border-teal bg-teal text-white shadow-lg shadow-teal/25"
-                  : "border-border/60 bg-background/50 hover:border-teal/40",
+                  ? "border-black border-l-4 border-l-marga-yellow bg-black text-white"
+                  : "border-black bg-white hover:bg-[#F5F5F5]",
               )}
             >
               {n}
             </button>
           ))}
         </div>
-        <div className="flex justify-between px-0 text-[10px] text-muted-foreground sm:px-1 sm:text-xs">
-          <span>{question.likertMinLabel ?? "Strongly disagree"}</span>
-          <span>{question.likertMaxLabel ?? "Strongly agree"}</span>
+        <div className="flex justify-between font-serif text-xs text-[#525252]">
+          <span>{question.likertMinLabel ?? "Disagree"}</span>
+          <span>{question.likertMaxLabel ?? "Agree"}</span>
         </div>
       </div>
     );
@@ -153,21 +147,13 @@ export function QuestionRenderer({
 
     return (
       <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">
-          1 = most · 5 = least — tap a rank for each row
-        </p>
         {question.rankItems.map((item, index) => (
-          <div
-            key={item.id}
-            className="rounded-2xl border border-border/60 bg-background/40 p-4"
-          >
-            <div className="mb-3 flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-xs font-bold">
-                {index + 1}
-              </span>
-              <span className="text-sm font-medium">{item.label}</span>
-            </div>
-            <div className="flex gap-2">
+          <div key={item.id} className="border border-black p-3">
+            <p className="mb-2 font-serif text-sm">
+              <span className="font-label mr-2">{index + 1}.</span>
+              {item.label}
+            </p>
+            <div className="grid grid-cols-5 gap-1">
               {[1, 2, 3, 4, 5].map((rank) => (
                 <button
                   key={rank}
@@ -175,12 +161,12 @@ export function QuestionRenderer({
                   onClick={() => assignRank(item.id, rank)}
                   disabled={usedRanks.has(rank) && ranks[item.id] !== rank}
                   className={cn(
-                    "h-10 flex-1 rounded-xl border text-xs font-semibold transition-all",
+                    "h-9 border font-label text-xs transition-colors duration-100",
                     ranks[item.id] === rank
-                      ? "border-teal bg-teal text-white"
+                      ? "border-black border-l-4 border-l-marga-yellow bg-black text-white"
                       : usedRanks.has(rank)
-                        ? "cursor-not-allowed border-border/40 text-muted-foreground/30"
-                        : "border-border/60 hover:border-teal/40",
+                        ? "cursor-not-allowed border-[#E5E5E5] text-[#E5E5E5]"
+                        : "border-black bg-white hover:bg-[#F5F5F5]",
                   )}
                 >
                   {rank}

@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <div className="flex min-h-full flex-col">
       <Header />
-      <main className="flex-1 pt-20 md:pt-24">
+      <main className="flex-1 pt-16">
         <HeroDemo />
         <Modules />
         <Stages />

@@ -7,6 +7,11 @@ import type { UserProfile } from "@/lib/auth-mock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  margaGhostLinkStyles,
+  margaInputFocusStyles,
+  margaPrimaryButtonStyles,
+} from "@/lib/brand-styles";
 import { cn } from "@/lib/utils";
 
 const LIFE_STAGES = [
@@ -15,6 +20,19 @@ const LIFE_STAGES = [
   { value: "motion", label: "College / early graduate (18–24)" },
   { value: "meaning", label: "Working professional (24+)" },
 ];
+
+const primaryButtonStyles = margaPrimaryButtonStyles;
+const ghostLinkStyles = margaGhostLinkStyles;
+const inputStyles = cn(
+  "!rounded-none border-0 border-b-2 border-black bg-transparent px-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-[#525252] placeholder:italic",
+  margaInputFocusStyles,
+);
+const selectStyles = cn(
+  "flex h-10 w-full !rounded-none border-0 border-b-2 border-black bg-transparent px-0 text-sm shadow-none ring-0 focus-visible:outline-none focus-visible:ring-0",
+  margaInputFocusStyles,
+);
+
+const labelStyles = "font-label text-[10px] uppercase tracking-widest text-[#525252]";
 
 interface ProfileSetupFormProps {
   defaultEmail?: string;
@@ -55,28 +73,34 @@ function ProfileSetupForm({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="font-montserrat w-full rounded-lg border-0 bg-card shadow-none"
-    >
+    <form onSubmit={handleSubmit} className="w-full bg-white text-black">
       <div className="p-8">
-        <MargaLogo />
-        <h2 className="mt-6 text-2xl leading-snug font-semibold text-pretty">
-          <span className="block text-muted-foreground">One last step</span>
-          Tell us about you
+        <MargaLogo variant="monochrome" />
+
+        <p className={cn(labelStyles, "mt-8 w-fit border border-black px-3 py-1.5")}>
+          Profile setup
+        </p>
+
+        <div className="mt-6 flex items-center gap-4">
+          <div className="h-1 w-16 bg-black" />
+          <div className="size-2.5 border-2 border-black" />
+        </div>
+
+        <h2 className="mt-6 font-display text-2xl leading-tight tracking-tight md:text-3xl">
+          One last step
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-3 font-serif text-sm leading-relaxed text-[#525252] md:text-base">
           This appears only once when you sign up. Returning logins go straight
           to your assessment — no profile form again.
         </p>
 
         {error && (
-          <p className="mt-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <p className="mt-5 border-l-4 border-black py-1 pl-4 font-serif text-sm text-black">
             {error}
           </p>
         )}
 
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-5">
           <Field label="Full name" id="profile-name" required>
             <Input
               id="profile-name"
@@ -84,7 +108,7 @@ function ProfileSetupForm({
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Adarsh Singh"
               required
-              className="border-input ring-1 ring-foreground/15"
+              className={inputStyles}
             />
           </Field>
 
@@ -97,10 +121,7 @@ function ProfileSetupForm({
               placeholder="you@example.com"
               required
               readOnly={Boolean(defaultEmail)}
-              className={cn(
-                "border-input ring-1 ring-foreground/15",
-                defaultEmail && "bg-muted/50",
-              )}
+              className={cn(inputStyles, defaultEmail && "text-[#525252]")}
             />
           </Field>
 
@@ -111,7 +132,7 @@ function ProfileSetupForm({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+91 98765 43210"
-              className="border-input ring-1 ring-foreground/15"
+              className={inputStyles}
             />
           </Field>
 
@@ -121,7 +142,7 @@ function ProfileSetupForm({
               type="date"
               value={dateOfBirth}
               onChange={(e) => setDateOfBirth(e.target.value)}
-              className="border-input ring-1 ring-foreground/15"
+              className={inputStyles}
             />
           </Field>
 
@@ -131,7 +152,7 @@ function ProfileSetupForm({
               value={lifeStage}
               onChange={(e) => setLifeStage(e.target.value)}
               required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-1 ring-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className={selectStyles}
             >
               <option value="" disabled>
                 Select your life stage
@@ -150,7 +171,7 @@ function ProfileSetupForm({
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="Mumbai, India"
-              className="border-input ring-1 ring-foreground/15"
+              className={inputStyles}
             />
           </Field>
 
@@ -160,28 +181,19 @@ function ProfileSetupForm({
               value={education}
               onChange={(e) => setEducation(e.target.value)}
               placeholder="Where you study or work"
-              className="border-input ring-1 ring-foreground/15"
+              className={inputStyles}
             />
           </Field>
         </div>
 
-        <Button
-          type="submit"
-          size="lg"
-          className="mt-6 w-full bg-teal font-montserrat text-white hover:bg-teal/90"
-        >
+        <Button type="submit" size="lg" className={cn(primaryButtonStyles, "mt-6 h-12 w-full")}>
           Save & continue to assessment
         </Button>
 
         {onBack && (
-          <Button
-            type="button"
-            variant="ghost"
-            className="mt-2 w-full"
-            onClick={onBack}
-          >
+          <button type="button" onClick={onBack} className={cn(ghostLinkStyles, "mt-4 w-full")}>
             Back to sign in
-          </Button>
+          </button>
         )}
       </div>
     </form>
@@ -201,9 +213,9 @@ function Field({
 }) {
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className="text-sm font-medium">
+      <Label htmlFor={id} className={labelStyles}>
         {label}
-        {required && <span className="text-teal"> *</span>}
+        {required && <span className="text-black"> *</span>}
       </Label>
       {children}
     </div>

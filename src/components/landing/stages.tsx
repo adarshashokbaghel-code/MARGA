@@ -1,17 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { GraduationCap, Briefcase, Rocket, Search } from "lucide-react";
+import { Briefcase, GraduationCap, Rocket, Search } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { MargaSectionRule } from "@/components/brand/marga-section-rule";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { margaBadgeStyles } from "@/lib/brand-styles";
+import { cn } from "@/lib/utils";
 
 const stages = [
   {
@@ -70,71 +65,91 @@ const stages = [
 
 export function Stages() {
   return (
-    <section id="stages" className="py-24">
-      <div className="container mx-auto px-4">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <Badge variant="outline" className="mb-4 border-teal/30 text-teal">
-            Life stages
-          </Badge>
-          <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+    <section id="stages" className="relative border-b-4 border-black bg-white text-black">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage: `repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 40px,
+            #00000008 40px,
+            #00000008 42px
+          )`,
+          opacity: 0.01,
+        }}
+      />
+
+      <div className="relative mx-auto w-full max-w-7xl px-6 pt-12 pb-16 md:px-8 md:pt-14 md:pb-20 lg:px-12 lg:pt-16 lg:pb-24 xl:px-16">
+        <p className={cn(margaBadgeStyles, "mb-6 px-4 py-2 text-xs")}>
+          Life stages
+        </p>
+
+        <MargaSectionRule />
+
+        <div className="mb-12 flex max-w-4xl flex-col gap-6">
+          <h2 className="font-display text-3xl leading-[1.1] tracking-tighter md:text-4xl lg:text-5xl">
             Meet you where you are
           </h2>
-          <p className="mt-4 text-muted-foreground">
+          <p className="max-w-3xl font-serif text-lg leading-relaxed text-[#525252] md:text-xl">
             From identity discovery in school to reinvention mid-career — Marga
             adapts to your crossroads.
           </p>
         </div>
 
-        <Tabs defaultValue="mirror" className="mx-auto max-w-5xl">
-          <TabsList className="mx-auto flex w-full max-w-2xl flex-wrap justify-center">
+        <Tabs defaultValue="mirror" className="mx-auto w-full max-w-5xl">
+          <TabsList className="!gap-0 !rounded-none !bg-white !p-0 flex h-auto w-full flex-col items-stretch justify-start overflow-hidden border border-black sm:flex-row">
             {stages.map((stage) => (
-              <TabsTrigger key={stage.id} value={stage.id}>
+              <TabsTrigger
+                key={stage.id}
+                value={stage.id}
+                className="font-label flex flex-1 items-center justify-center !rounded-none border-0 border-b border-black bg-transparent px-4 py-3.5 text-xs uppercase tracking-widest text-[#525252] shadow-none ring-0 transition-colors duration-100 last:border-b-0 hover:text-marga-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-black focus-visible:outline-offset-[-2px] data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-[inset_0_-3px_0_0_var(--marga-yellow)] data-[state=active]:hover:text-white sm:border-b-0 sm:border-r sm:data-[state=active]:shadow-[inset_0_3px_0_0_var(--marga-yellow)] sm:last:border-r-0"
+              >
                 {stage.name}
               </TabsTrigger>
             ))}
           </TabsList>
 
           {stages.map((stage) => (
-            <TabsContent key={stage.id} value={stage.id}>
-              <Card className="overflow-hidden border-border/60 shadow-lg">
-                <div className="grid md:grid-cols-2">
-                  <div className="relative min-h-[280px] md:min-h-full">
-                    <Image
-                      src={stage.image}
-                      alt={stage.alt}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent md:bg-gradient-to-r" />
-                    <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                      <stage.icon className="h-5 w-5 text-teal" />
-                      <span className="text-sm font-medium text-white">
-                        {stage.age}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col justify-center">
-                    <CardHeader>
-                      <Badge variant="secondary" className="mb-2 w-fit">
-                        {stage.stage}
-                      </Badge>
-                      <CardTitle className="text-foreground">{stage.name}</CardTitle>
-                      <CardDescription className="text-base leading-relaxed">
-                        {stage.experience}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="rounded-xl bg-teal/10 p-4 text-sm leading-relaxed text-foreground dark:bg-teal/20">
-                        <span className="font-semibold text-teal">
-                          How Marga helps:{" "}
-                        </span>
-                        {stage.help}
-                      </p>
-                    </CardContent>
+            <TabsContent key={stage.id} value={stage.id} className="mt-0">
+              <div className="grid border border-t-0 border-black bg-white md:grid-cols-2">
+                <div className="group relative min-h-[280px] border-b border-black md:min-h-[360px] md:border-b-0 md:border-r">
+                  <Image
+                    src={stage.image}
+                    alt={stage.alt}
+                    fill
+                    className="object-cover grayscale transition-all duration-300 group-hover:grayscale-0"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute bottom-4 left-4 flex items-center gap-2 border border-white bg-black px-3 py-1.5">
+                    <stage.icon className="size-4 text-white" strokeWidth={1.5} />
+                    <span className="font-label text-[10px] uppercase tracking-widest text-white">
+                      {stage.age}
+                    </span>
                   </div>
                 </div>
-              </Card>
+
+                <div className="flex flex-col justify-center p-6 md:p-10">
+                  <p className="font-label mb-4 w-fit border border-black px-3 py-1.5 text-[10px] uppercase tracking-widest text-[#525252]">
+                    {stage.stage}
+                  </p>
+                  <h3 className="font-display text-2xl tracking-tight md:text-3xl">
+                    {stage.name}
+                  </h3>
+                  <p className="mt-4 font-serif text-base leading-relaxed text-[#525252] md:text-lg">
+                    {stage.experience}
+                  </p>
+                  <blockquote className="mt-6 border-l-4 border-black py-1 pl-5">
+                    <p className="font-serif text-sm leading-relaxed text-[#525252] md:text-base">
+                      <span className="font-display text-base text-black md:text-lg">
+                        How Marga helps.{" "}
+                      </span>
+                      {stage.help}
+                    </p>
+                  </blockquote>
+                </div>
+              </div>
             </TabsContent>
           ))}
         </Tabs>

@@ -1,10 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { Compass, MoveRight } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+
+import { MargaSectionRule } from "@/components/brand/marga-section-rule";
 import { Button } from "@/components/ui/button";
 import { GetStartedButton } from "@/components/ui/get-started-button";
+import {
+  margaBadgeStyles,
+  margaOutlineButtonStyles,
+  margaPrimaryButtonStyles,
+} from "@/lib/brand-styles";
+import { cn } from "@/lib/utils";
 
 function Hero() {
   const [titleNumber, setTitleNumber] = useState(0);
@@ -15,75 +23,72 @@ function Hero() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (titleNumber === titles.length - 1) {
-        setTitleNumber(0);
-      } else {
-        setTitleNumber(titleNumber + 1);
-      }
-    }, 2000);
+      setTitleNumber((current) => (current === titles.length - 1 ? 0 : current + 1));
+    }, 2400);
     return () => clearTimeout(timeoutId);
-  }, [titleNumber, titles]);
+  }, [titleNumber, titles.length]);
 
   return (
-    <div className="w-full">
-      <div className="container mx-auto">
-        <div className="flex flex-col items-center justify-center gap-8 py-20 lg:py-40">
-          <div>
-            <Button variant="secondary" size="sm" className="gap-4">
-              30 min · 45 questions ·                 5 Archetypes
-              <MoveRight className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="flex flex-col gap-4">
-            <h1 className="max-w-4xl text-center text-5xl font-regular tracking-tighter md:text-7xl">
-              <span className="text-foreground">Career clarity starts with </span>
-              <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1">
-                &nbsp;
-                {titles.map((title, index) => (
+    <div className="w-full border-b-4 border-black shadow-[inset_0_-4px_0_0_var(--marga-yellow)]">
+      <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="flex w-full flex-col pt-16 pb-12 md:pt-20 md:pb-14 lg:pt-24 lg:pb-16">
+          <p className={cn(margaBadgeStyles, "mb-6 px-4 py-2 text-xs")}>
+            30 min · 45 questions · 5 archetypes
+          </p>
+
+          <MargaSectionRule />
+
+          <div className="flex w-full flex-col gap-8">
+            <h1 className="w-full font-display text-4xl leading-[1.15] tracking-tighter  sm:text-5xl md:text-6xl lg:text-7xl">
+              <span className="text-black">Career clarity starts with </span>
+              <span
+                className="relative inline-block h-[1.10em] overflow-hidden text-marga-yellow align-baseline italic"
+                aria-live="polite"
+              >
+                <span className="invisible whitespace-nowrap " aria-hidden>
+                  your strengths
+                </span>
+                <AnimatePresence mode="wait" initial={false}>
                   <motion.span
-                    key={index}
-                    className="absolute font-semibold text-teal"
-                    initial={{ opacity: 0, y: -100 }}
-                    transition={{ type: "spring", stiffness: 50 }}
-                    animate={
-                      titleNumber === index
-                        ? {
-                            y: 0,
-                            opacity: 1,
-                          }
-                        : {
-                            y: titleNumber > index ? -150 : 150,
-                            opacity: 0,
-                          }
-                    }
+                    key={titles[titleNumber]}
+                    initial={{ y: "100%", opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: "-100%", opacity: 0 }}
+                    transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                    className="absolute inset-x-0 top-0 whitespace-nowrap"
                   >
-                    {title}
+                    {titles[titleNumber]}
                   </motion.span>
-                ))}
+                </AnimatePresence>
               </span>
             </h1>
 
-            <p className="max-w-3xl text-center font-montserrat text-lg leading-relaxed tracking-tight text-muted-foreground md:text-xl">
+            <p className="max-w-4xl font-serif text-lg leading-relaxed tracking-normal text-[#525252] md:text-xl lg:text-2xl">
               Marga combines psychometric science, skill assessment, and
               psychological profiling into one honest portrait of who you are —
               and where you could go. We change the career conversation from
               &ldquo;what should I do?&rdquo; to &ldquo;who am I?&rdquo;
             </p>
           </div>
-          <div className="flex flex-row gap-3">
-            <Button
-              size="lg"
-              className="gap-4 border-teal/40 hover:bg-teal/10"
-              variant="outline"
-            >
-              How Marga works <Compass className="h-4 w-4" />
-            </Button>
+
+          <div className="mt-14 flex flex-col gap-4 sm:flex-row sm:items-center">
             <GetStartedButton
               size="lg"
-              className="gap-4 bg-teal text-white hover:bg-teal/90"
+              className={cn(margaPrimaryButtonStyles, "h-auto gap-3 px-8 py-4")}
             >
-              Begin your assessment <MoveRight className="h-4 w-4" />
+              Begin your assessment
+              <ArrowRight className="size-4" strokeWidth={1.5} />
             </GetStartedButton>
+            <Button
+              size="lg"
+              variant="outline"
+              className={cn(
+                margaOutlineButtonStyles,
+                "h-auto gap-3 bg-transparent px-8 py-4",
+              )}
+            >
+              How Marga works
+            </Button>
           </div>
         </div>
       </div>
