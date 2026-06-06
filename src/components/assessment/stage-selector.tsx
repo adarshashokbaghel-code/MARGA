@@ -110,8 +110,7 @@ export function StageSelector({
                       : "hover:border-teal/25 hover:bg-background/80",
                     !division.available && "opacity-50",
                   )}
-                  // comment
-                  // comment 2
+// comment
                 >
                   <div
                     className={cn(
