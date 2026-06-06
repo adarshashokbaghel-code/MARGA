@@ -111,7 +111,7 @@ function LoginModalProvider({ children }: { children: ReactNode }) {
     <LoginModalContext.Provider value={value}>
       {children}
       <Dialog open={open} onOpenChange={handleDialogChange}>
-        <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto border-border p-0 sm:rounded-xl">
+        <DialogContent className="!rounded-none max-h-[90vh] max-w-md overflow-y-auto border-2 border-black bg-white p-0 shadow-none duration-100 data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100 [&>button]:top-4 [&>button]:right-4 [&>button]:flex [&>button]:size-9 [&>button]:items-center [&>button]:justify-center [&>button]:!rounded-none [&>button]:border [&>button]:border-black [&>button]:bg-white [&>button]:opacity-100 [&>button]:ring-0 [&>button]:transition-colors [&>button]:duration-100 hover:[&>button]:bg-black hover:[&>button]:text-white [&>button]:focus:ring-0 [&>button]:focus-visible:outline [&>button]:focus-visible:outline-2 [&>button]:focus-visible:outline-black">
           {step === "login" ? (
             <LoginForm
               onGoogleSignIn={handleGoogleSignIn}

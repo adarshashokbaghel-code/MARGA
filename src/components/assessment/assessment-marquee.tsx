@@ -4,13 +4,13 @@ import { Marquee } from "@/components/ui/marquee";
 
 const TICKER_ITEMS = [
   "No right or wrong answers",
-  "Psychometric science · warm interface",
-  "Skip any question anytime",
+  "Psychometric science",
+  "Skip any question",
   "Submit with partial answers",
   "5 archetypes · domain mapping",
-  "Built for Indian students",
   "Private & judgment-free",
   "~30 minutes on any phone",
+  "6 modules · M.A.R.G.A.",
 ];
 
 export function AssessmentMarquee() {
@@ -18,25 +18,15 @@ export function AssessmentMarquee() {
     <div
       role="region"
       aria-label="Assessment highlights"
-      className="relative w-full overflow-hidden border-b border-teal/20 bg-gradient-to-r from-teal/[0.08] via-teal/[0.12] to-cyan-500/[0.08] py-3 sm:py-3.5"
+      className="w-full overflow-hidden border-b border-black bg-[#F5F5F5] py-2.5"
     >
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-teal/[0.12] to-transparent sm:w-16" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-cyan-500/[0.08] to-transparent sm:w-16" />
-
-      <Marquee
-        pauseOnHover
-        repeat={5}
-        className="[--duration:28s] [--gap:2rem] sm:[--gap:3rem]"
-      >
+      <Marquee pauseOnHover repeat={4} className="[--duration:32s] [--gap:2.5rem]">
         {TICKER_ITEMS.map((item) => (
           <span
             key={item}
-            className="flex shrink-0 items-center gap-2 whitespace-nowrap text-xs font-semibold tracking-wide text-teal sm:text-sm"
+            className="font-label flex shrink-0 items-center gap-2 whitespace-nowrap text-[10px] uppercase tracking-widest text-[#525252]"
           >
-            <span
-              className="h-1.5 w-1.5 shrink-0 rounded-full bg-teal"
-              aria-hidden
-            />
+            <span className="size-1.5 shrink-0 bg-black" aria-hidden />
             {item}
           </span>
         ))}

@@ -14,7 +14,7 @@ export default function About() {
   return (
     <div className="flex min-h-full flex-col">
       <Header />
-      <main className="flex-1 pt-20 md:pt-24">
+      <main className="flex-1 pt-16 md:pt-20">
         <AboutPage />
       </main>
       <Footer />

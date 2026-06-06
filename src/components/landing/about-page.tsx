@@ -9,17 +9,18 @@ import {
   Sparkles,
   Target,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { MargaSectionRule } from "@/components/brand/marga-section-rule";
 import { GetStartedButton } from "@/components/ui/get-started-button";
-import { DotPattern } from "@/components/ui/dot-pattern";
+import {
+  margaBadgeInvertedStyles,
+  margaBadgeStyles,
+  margaLabelStyles,
+  margaLinkStyles,
+  margaPrimaryButtonStyles,
+} from "@/lib/brand-styles";
+import { cn } from "@/lib/utils";
 
 const pressureFactors = [
   "marks",
@@ -197,48 +198,156 @@ const futureSkills = [
   "interdisciplinary thinking",
 ];
 
+const labelStyles = margaLabelStyles;
+
+function SectionBadge({
+  children,
+  inverted,
+}: {
+  children: React.ReactNode;
+  inverted?: boolean;
+}) {
+  return (
+    <p
+      className={cn(
+        "mb-6",
+        inverted ? margaBadgeInvertedStyles : cn(margaBadgeStyles, "px-4 py-2 text-xs"),
+      )}
+    >
+      {children}
+    </p>
+  );
+}
+
 function SectionHeading({
   badge,
   title,
   description,
+  inverted,
+  align = "center",
 }: {
   badge: string;
   title: string;
   description?: string;
+  inverted?: boolean;
+  align?: "center" | "left";
 }) {
   return (
-    <div className="mx-auto mb-12 max-w-2xl text-center">
-      <Badge variant="outline" className="mb-4 border-teal/30 text-teal">
-        {badge}
-      </Badge>
-      <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+    <div
+      className={cn(
+        "mb-12",
+        align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-3xl",
+      )}
+    >
+      <SectionBadge inverted={inverted}>{badge}</SectionBadge>
+      <MargaSectionRule inverted={inverted} />
+      <h2
+        className={cn(
+          "font-display text-3xl leading-[1.1] tracking-tighter md:text-4xl",
+          inverted && "text-white",
+        )}
+      >
         {title}
       </h2>
       {description ? (
-        <p className="mt-4 text-muted-foreground">{description}</p>
+        <p
+          className={cn(
+            "mt-4 text-base leading-relaxed md:text-lg",
+            inverted ? "text-white/70" : "text-[#525252]",
+          )}
+        >
+          {description}
+        </p>
       ) : null}
     </div>
   );
 }
 
+function Panel({
+  children,
+  className,
+  inverted,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  inverted?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "border border-black p-5 sm:p-6",
+        inverted ? "bg-black text-white" : "bg-white",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Tag({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="border border-black bg-[#F5F5F5] px-3 py-1.5 text-sm capitalize">
+      {children}
+    </span>
+  );
+}
+
+function MargaDimensionCard({
+  letter,
+  name,
+  description,
+  icon: Icon,
+}: {
+  letter: string;
+  name: string;
+  description: string;
+  icon: LucideIcon;
+}) {
+  return (
+    <Panel className="group border-l-4 border-l-transparent transition-colors duration-100 hover:border-l-marga-yellow hover:bg-black hover:text-white">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 items-center justify-center border border-black bg-marga-yellow-muted text-lg font-semibold group-hover:border-marga-yellow group-hover:bg-marga-yellow group-hover:text-black">
+          {letter}
+        </span>
+        <Icon
+          className="size-5 text-black group-hover:text-white"
+          strokeWidth={1.5}
+        />
+      </div>
+      <h3 className="mt-4 font-display text-lg tracking-tight">{name}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-[#525252] group-hover:text-white/70">
+        {description}
+      </p>
+    </Panel>
+  );
+}
+
 export function AboutPage() {
   return (
-    <>
-      <section className="relative overflow-hidden border-b bg-muted/20 py-20 md:py-28">
-        <DotPattern
-          className="absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]"
-          width={20}
-          height={20}
+    <div className="bg-white text-black">
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b-4 border-black">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(#00000008 1px, transparent 1px),
+              linear-gradient(90deg, #00000008 1px, transparent 1px)
+            `,
+            backgroundSize: "40px 40px",
+            opacity: 0.5,
+          }}
         />
-        <div className="container relative mx-auto px-4">
+        <div className="relative mx-auto w-full max-w-7xl px-6 py-16 md:px-8 md:py-20 lg:px-12 lg:py-24 xl:px-16">
+          <SectionBadge>About us</SectionBadge>
+          <MargaSectionRule />
           <div className="mx-auto max-w-3xl text-center">
-            <Badge className="mb-4 bg-teal/10 text-teal hover:bg-teal/10">
-              About us
-            </Badge>
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+            <h1 className="font-display text-4xl leading-[1.05] tracking-tighter md:text-5xl lg:text-6xl">
               The science behind Marga
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+            <p className="mt-6 text-base leading-relaxed text-[#525252] md:text-lg">
               Marga.me combines psychometric science, skill assessment, and
               psychological profiling into one honest, human portrait of who you
               are — and where you could go. We build rigorous tools with warm
@@ -250,62 +359,52 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
-            <Card className="border-border/60 shadow-sm">
-              <CardHeader>
-                <Badge variant="secondary" className="mb-2 w-fit">
-                  Vision
-                </Badge>
-                <CardTitle className="text-xl md:text-2xl">
-                  A world where no one loses years of their life to the wrong
-                  career
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="leading-relaxed text-muted-foreground">
-                  Career confusion is not a personal failure — it is a systemic
-                  one. For too long, access to meaningful self-knowledge has
-                  belonged to those with the right mentors, the right schools, or
-                  the right network. Marga exists to change that. We envision a
-                  future where every student, every professional, every person at
-                  a crossroads has the tools to understand themselves deeply — and
-                  the clarity to move forward with conviction.
-                </p>
-              </CardContent>
-            </Card>
+      {/* Vision + Mission */}
+      <section className="border-b-4 border-black py-16 md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Panel>
+              <p className={labelStyles}>Vision</p>
+              <h2 className="mt-3 font-display text-xl tracking-tight md:text-2xl">
+                A world where no one loses years of their life to the wrong
+                career
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-[#525252] md:text-base">
+                Career confusion is not a personal failure — it is a systemic
+                one. For too long, access to meaningful self-knowledge has
+                belonged to those with the right mentors, the right schools, or
+                the right network. Marga exists to change that. We envision a
+                future where every student, every professional, every person at
+                a crossroads has the tools to understand themselves deeply — and
+                the clarity to move forward with conviction.
+              </p>
+            </Panel>
 
-            <Card className="border-teal/20 bg-teal/5 shadow-sm">
-              <CardHeader>
-                <Badge className="mb-2 w-fit bg-teal/20 text-teal hover:bg-teal/20">
-                  Mission
-                </Badge>
-                <CardTitle className="text-xl md:text-2xl">
-                  Deep career self-knowledge for every person, everywhere
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="leading-relaxed text-muted-foreground">
-                  We build rigorous tools with warm interfaces, so that the
-                  clarity once reserved for expensive coaches and elite
-                  institutions is available to anyone with a phone and a question
-                  about their future.
-                </p>
-              </CardContent>
-            </Card>
+            <Panel inverted>
+              <p className={cn(labelStyles, "text-white/60")}>Mission</p>
+              <h2 className="mt-3 font-display text-xl tracking-tight text-white md:text-2xl">
+                Deep career self-knowledge for every person, everywhere
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-white/70 md:text-base">
+                We build rigorous tools with warm interfaces, so that the
+                clarity once reserved for expensive coaches and elite
+                institutions is available to anyone with a phone and a question
+                about their future.
+              </p>
+            </Panel>
           </div>
         </div>
       </section>
 
-      <section className="border-y bg-muted/30 py-20">
-        <div className="container mx-auto px-4">
+      {/* The problem */}
+      <section className="border-b-4 border-black bg-[#F5F5F5] py-16 md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
           <SectionHeading
             badge="The problem"
             title="We change the starting point of the career conversation"
             description='From "what should I do?" to "who am I?"'
           />
-          <p className="mx-auto max-w-3xl text-center text-lg leading-relaxed text-muted-foreground">
+          <p className="mx-auto max-w-3xl text-center text-base leading-relaxed text-[#525252] md:text-lg">
             Millions of students pick careers based on peer pressure, parental
             expectation, or salary alone — without ever asking who they actually
             are. Millions of professionals stay stuck in roles that drain them
@@ -315,19 +414,19 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-2 lg:items-center">
+      {/* Why Marga exists */}
+      <section className="border-b-4 border-black py-16 md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
             <div>
-              <Badge variant="outline" className="mb-4 border-teal/30 text-teal">
-                Why Marga exists
-              </Badge>
-              <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+              <SectionBadge>Why Marga exists</SectionBadge>
+              <MargaSectionRule />
+              <h2 className="font-display text-3xl leading-[1.1] tracking-tighter md:text-4xl">
                 Career discovery should begin with self-discovery
               </h2>
-              <p className="mt-4 leading-relaxed text-muted-foreground">
+              <p className="mt-4 text-sm leading-relaxed text-[#525252] md:text-base">
                 Most students are asked one question far too early:{" "}
-                <span className="font-medium text-foreground">
+                <span className="font-medium text-black">
                   &ldquo;What do you want to become?&rdquo;
                 </span>{" "}
                 But very few are first helped to understand how they naturally
@@ -335,7 +434,7 @@ export function AboutPage() {
                 environments energize them, and what kind of future actually
                 aligns with who they are.
               </p>
-              <p className="mt-4 leading-relaxed text-muted-foreground">
+              <p className="mt-4 text-sm leading-relaxed text-[#525252] md:text-base">
                 Marga was built to change that. We believe in a deeper
                 understanding of identity, motivation, behavior, strengths, and
                 growth — not labels, stereotypes, or one-size-fits-all aptitude
@@ -343,238 +442,199 @@ export function AboutPage() {
               </p>
             </div>
 
-            <Card className="border-border/60">
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  As a result, millions choose careers based on:
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="flex flex-wrap gap-2">
-                  {pressureFactors.map((factor) => (
-                    <li
-                      key={factor}
-                      className="rounded-full bg-muted px-4 py-2 text-sm font-medium capitalize text-foreground"
-                    >
-                      {factor}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            <Panel>
+              <h3 className="font-display text-lg tracking-tight">
+                As a result, millions choose careers based on:
+              </h3>
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {pressureFactors.map((factor) => (
+                  <li key={factor}>
+                    <Tag>{factor}</Tag>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
           </div>
         </div>
       </section>
 
-      <section className="border-y bg-navy-deep py-20 text-white">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge className="mb-4 bg-teal/20 text-white hover:bg-teal/20">
-              What makes us different
-            </Badge>
-            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
-              Not a traditional psychometric test
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-white/80">
-              Marga is an AI-native identity and career discovery system designed
-              to understand patterns across motivation, ability, resilience, goals,
-              self-awareness, behavioral consistency, contextual interests, and
-              future aspirations.
-            </p>
-          </div>
+      {/* What makes us different */}
+      <section className="border-b-4 border-black bg-black py-16 text-white md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
+          <SectionHeading
+            badge="What makes us different"
+            title="Not a traditional psychometric test"
+            description="Marga is an AI-native identity and career discovery system designed to understand patterns across motivation, ability, resilience, goals, self-awareness, behavioral consistency, contextual interests, and future aspirations."
+            inverted
+          />
 
-          <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-2">
-            <Card className="border-white/10 bg-white/5 text-white">
-              <CardHeader>
-                <CardTitle className="text-lg text-white/60">
-                  Instead of asking
-                </CardTitle>
-                <CardDescription className="text-xl font-medium text-white">
-                  &ldquo;What career fits you?&rdquo;
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="border-teal/30 bg-teal/10 text-white">
-              <CardHeader>
-                <CardTitle className="text-lg text-teal">Marga asks</CardTitle>
-                <CardDescription className="text-xl font-medium text-white">
-                  &ldquo;What patterns consistently emerge across who you are, how
-                  you think, and what kind of future energizes you?&rdquo;
-                </CardDescription>
-              </CardHeader>
-            </Card>
+          <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-2">
+            <Panel className="border-white/20 bg-white/5">
+              <p className={cn(labelStyles, "text-white/50")}>Instead of asking</p>
+              <p className="mt-3 font-display text-xl tracking-tight text-white/80">
+                &ldquo;What career fits you?&rdquo;
+              </p>
+            </Panel>
+            <Panel className="border-white bg-white text-black">
+              <p className={labelStyles}>Marga asks</p>
+              <p className="mt-3 font-display text-xl tracking-tight">
+                &ldquo;What patterns consistently emerge across who you are, how
+                you think, and what kind of future energizes you?&rdquo;
+              </p>
+            </Panel>
           </div>
-          <p className="mx-auto mt-8 max-w-xl text-center text-teal">
-            That distinction changes everything.
+          <p className="mx-auto mt-8 max-w-xl text-center font-display text-lg italic text-white/80">
+            That distinction changes <span className="text-marga-yellow">everything</span>.
           </p>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      {/* How it works */}
+      <section className="border-b-4 border-black py-16 md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
           <SectionHeading
             badge="How it works"
             title="One integrated system for alignment"
             description="The goal is not prediction. The goal is alignment."
           />
 
-          <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2">
-            <Card className="border-border/60">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Layers className="h-5 w-5 text-teal" />
-                  Marga combines
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-muted-foreground">
-                  {[
-                    "contextual exploration",
-                    "behavioral assessment",
-                    "psychological pattern recognition",
-                    "developmental guidance",
-                    "domain and industry mapping",
-                  ].map((item) => (
-                    <li key={item} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-teal" />
-                      <span className="capitalize">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Panel>
+              <h3 className="flex items-center gap-2 font-display text-lg tracking-tight">
+                <Layers className="size-5" strokeWidth={1.5} />
+                Marga combines
+              </h3>
+              <ul className="mt-4 space-y-2 text-sm text-[#525252]">
+                {[
+                  "contextual exploration",
+                  "behavioral assessment",
+                  "psychological pattern recognition",
+                  "developmental guidance",
+                  "domain and industry mapping",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className="size-1.5 shrink-0 bg-black" />
+                    <span className="capitalize">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
 
-            <Card className="border-border/60">
-              <CardHeader>
-                <CardTitle className="text-lg">To generate</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-muted-foreground">
-                  {[
-                    "primary and secondary archetypes",
-                    "domain affinities",
-                    "industry alignments",
-                    "possible career pathways",
-                    "growth recommendations",
-                    "developmental insights",
-                  ].map((item) => (
-                    <li key={item} className="flex items-center gap-2">
-                      <ArrowRight className="h-4 w-4 shrink-0 text-teal" />
-                      <span className="capitalize">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            <Panel>
+              <h3 className="font-display text-lg tracking-tight">To generate</h3>
+              <ul className="mt-4 space-y-2 text-sm text-[#525252]">
+                {[
+                  "primary and secondary archetypes",
+                  "domain affinities",
+                  "industry alignments",
+                  "possible career pathways",
+                  "growth recommendations",
+                  "developmental insights",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <ArrowRight className="size-4 shrink-0 text-black" strokeWidth={1.5} />
+                    <span className="capitalize">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
           </div>
         </div>
       </section>
 
-      <section className="border-y bg-muted/30 py-20">
-        <div className="container mx-auto px-4">
+      {/* MARGA framework */}
+      <section className="border-b-4 border-black bg-[#F5F5F5] py-16 md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
           <SectionHeading
             badge="The MARGA framework"
             title="Five dimensions. One complete portrait."
             description="Together, these dimensions create a more complete picture of a learner's identity and future potential."
           />
-          <div className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {margaDimensions.map((dim) => (
-              <Card
-                key={dim.name}
-                className="border-border/60 transition-shadow hover:shadow-md"
-              >
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal/10 text-lg font-bold text-teal">
-                      {dim.letter}
-                    </span>
-                    <dim.icon className="h-5 w-5 text-teal" />
-                  </div>
-                  <CardTitle className="text-lg">{dim.name}</CardTitle>
-                  <CardDescription className="text-base leading-relaxed">
-                    {dim.description}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <MargaDimensionCard key={dim.name} {...dim} />
             ))}
-            <Card className="border-teal/20 bg-teal/5 sm:col-span-2 lg:col-span-1">
-              <CardHeader>
-                <CardTitle className="text-lg">45 questions · 30 minutes</CardTitle>
-                <CardDescription className="text-base leading-relaxed">
+            <Panel className="flex flex-col justify-between border-2 border-black bg-black text-white sm:col-span-2 lg:col-span-1">
+              <div>
+                <p className={cn(labelStyles, "text-white/60")}>Assessment</p>
+                <h3 className="mt-3 font-display text-lg tracking-tight">
+                  45 questions · 30 minutes
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/70">
                   Three question formats mixed across 8 psychological models — a
                   rigorous assessment you can finish on any phone.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link
-                  href="/#modules"
-                  className="inline-flex items-center gap-1 text-sm font-medium text-teal hover:underline"
-                >
-                  Explore the framework
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </CardContent>
-            </Card>
+                </p>
+              </div>
+              <Link
+                href="/#modules"
+                className={cn(
+                  "mt-6 inline-flex items-center gap-1 font-label text-xs uppercase tracking-widest text-white",
+                  margaLinkStyles,
+                )}
+              >
+                Explore the framework
+                <ArrowRight className="size-4" strokeWidth={1.5} />
+              </Link>
+            </Panel>
           </div>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      {/* Psychological foundations */}
+      <section className="border-b-4 border-black py-16 md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
           <SectionHeading
             badge="Psychological foundations"
             title="Built on globally respected frameworks"
             description="These models are not used to label students. They are used to better understand human behavior, motivation, learning, growth, and identity."
           />
-          <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-2">
+
+          <div className="grid gap-4 md:grid-cols-2">
             {psychologicalFrameworks.map((framework) => (
-              <Card key={framework.name} className="border-border/60">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">{framework.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-teal">
-                      Used to understand
-                    </p>
-                    <ul className="mt-2 flex flex-wrap gap-1.5">
-                      {framework.usedFor.map((item) => (
-                        <li
-                          key={item}
-                          className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground"
-                        >
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {framework.insight}
-                  </p>
-                </CardContent>
-              </Card>
+              <Panel key={framework.name}>
+                <h3 className="font-display text-base tracking-tight">
+                  {framework.name}
+                </h3>
+                <div className="mt-4">
+                  <p className={labelStyles}>Used to understand</p>
+                  <ul className="mt-2 flex flex-wrap gap-1.5">
+                    {framework.usedFor.map((item) => (
+                      <li
+                        key={item}
+                        className="border border-[#E5E5E5] bg-[#F5F5F5] px-2 py-1 text-xs text-[#525252]"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <p className="mt-4 border-l-4 border-marga-yellow pl-3 text-sm leading-relaxed text-[#525252]">
+                  {framework.insight}
+                </p>
+              </Panel>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-y bg-muted/30 py-20">
-        <div className="container mx-auto px-4">
+      {/* Multi-framework */}
+      <section className="border-b-4 border-black bg-[#F5F5F5] py-16 md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="outline" className="mb-4 border-teal/30 text-teal">
-              Multi-framework approach
-            </Badge>
-            <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+            <SectionBadge>Multi-framework approach</SectionBadge>
+            <MargaSectionRule />
+            <h2 className="font-display text-3xl leading-[1.1] tracking-tighter md:text-4xl">
               Human beings are complex
             </h2>
-            <p className="mt-6 leading-relaxed text-muted-foreground">
+            <p className="mt-6 text-sm leading-relaxed text-[#525252] md:text-base">
               No single theory can fully explain identity, ambition, creativity,
               resilience, purpose, behavior, learning, or future potential. That is
               why Marga uses a multi-framework approach — looking for repeated
               patterns, behavioral consistency, motivational alignment, contextual
               reinforcement, and developmental potential.
             </p>
-            <p className="mt-4 font-medium text-foreground">
+            <p className="mt-4 font-medium text-black">
               This creates insights that feel more human, more accurate, more
               emotionally resonant, and more growth-oriented.
             </p>
@@ -582,89 +642,103 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-2">
+      {/* Discovery + future skills */}
+      <section className="border-b-4 border-black py-16 md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
+          <div className="grid gap-8 lg:grid-cols-2">
             <div>
-              <Badge variant="outline" className="mb-4 border-teal/30 text-teal">
-                What you&apos;ll discover
-              </Badge>
-              <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+              <SectionBadge>What you&apos;ll discover</SectionBadge>
+              <MargaSectionRule />
+              <h2 className="font-display text-3xl leading-[1.1] tracking-tighter md:text-4xl">
                 Questions worth answering before choosing a path
               </h2>
               <ul className="mt-6 space-y-3">
                 {discoveryQuestions.map((question) => (
                   <li
                     key={question}
-                    className="flex items-start gap-3 text-muted-foreground"
+                    className="flex items-start gap-3 text-sm text-[#525252] md:text-base"
                   >
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-teal" />
+                    <span className="mt-2 size-1.5 shrink-0 bg-marga-yellow" />
                     {question}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <Card className="border-border/60 bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  The careers of tomorrow will reward
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="flex flex-wrap gap-2">
-                  {futureSkills.map((skill) => (
-                    <li
-                      key={skill}
-                      className="rounded-full border border-teal/20 bg-teal/5 px-4 py-2 text-sm font-medium text-foreground"
-                    >
-                      {skill}
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-6 leading-relaxed text-muted-foreground">
-                  Marga exists to help learners navigate that future with greater
-                  clarity, confidence, and self-understanding. Because the best
-                  career decisions are not made from pressure — they are made from
-                  alignment.
-                </p>
-              </CardContent>
-            </Card>
+            <Panel>
+              <h3 className="font-display text-lg tracking-tight">
+                The careers of tomorrow will reward
+              </h3>
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {futureSkills.map((skill) => (
+                  <li key={skill}>
+                    <Tag>{skill}</Tag>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-6 text-sm leading-relaxed text-[#525252] md:text-base">
+                Marga exists to help learners navigate that future with greater
+                clarity, confidence, and self-understanding. Because the best
+                career decisions are not made from pressure — they are made from
+                alignment.
+              </p>
+            </Panel>
           </div>
         </div>
       </section>
 
-      <section className="pb-24">
-        <div className="container mx-auto px-4">
-          <Card className="relative overflow-hidden border-0 bg-navy-deep text-white shadow-2xl">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal/30 via-transparent to-transparent" />
-            <CardHeader className="relative z-10 max-w-2xl pb-2 text-center md:mx-auto md:pt-12">
-              <CardTitle className="text-3xl font-semibold text-white md:text-4xl">
+      {/* CTA */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 lg:px-12 xl:px-16">
+          <div className="relative overflow-hidden border-2 border-black bg-black p-8 text-center text-white sm:p-12 md:p-16">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage: `repeating-linear-gradient(
+                  90deg,
+                  transparent,
+                  transparent 1px,
+                  #fff 1px,
+                  #fff 2px
+                )`,
+                backgroundSize: "4px 100%",
+                opacity: 0.03,
+              }}
+            />
+            <div className="relative z-10">
+              <h2 className="font-display text-3xl leading-[1.1] tracking-tighter md:text-4xl">
                 Ready to start with who you are?
-              </CardTitle>
-              <CardDescription className="text-base leading-relaxed text-white/80 md:text-lg">
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/70 md:text-lg">
                 Take the MARGA assessment and discover your archetypes, domain
                 affinities, and exploration pathways — in about 30 minutes.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="relative z-10 flex flex-col items-center gap-4 pb-12">
-              <GetStartedButton
-                size="lg"
-                className="gap-4 rounded-full bg-teal px-8 text-white hover:bg-teal/90"
-              >
-                Begin your journey
-                <MoveRight className="h-4 w-4" />
-              </GetStartedButton>
-              <Link
-                href="/#stages"
-                className="text-sm text-white/70 transition-colors hover:text-white"
-              >
-                See how Marga meets you at your life stage →
-              </Link>
-            </CardContent>
-          </Card>
+              </p>
+              <div className="mt-8 flex flex-col items-center gap-4">
+                <GetStartedButton
+                  size="lg"
+                  className={cn(
+                    margaPrimaryButtonStyles,
+                    "h-auto gap-3 border-white bg-white px-8 py-4 text-black hover:border-marga-yellow hover:bg-marga-yellow",
+                  )}
+                >
+                  Begin your journey
+                  <MoveRight className="size-4" strokeWidth={1.5} />
+                </GetStartedButton>
+                <Link
+                  href="/#stages"
+                  className={cn(
+                    "font-label text-xs uppercase tracking-widest text-white/60",
+                    margaLinkStyles,
+                  )}
+                >
+                  See how Marga meets you at your life stage →
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
